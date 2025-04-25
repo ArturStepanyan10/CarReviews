@@ -1,0 +1,36 @@
+
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: postgresql_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: cr
+      POSTGRES_DB: cr_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: cr_db
+      DB_USER: cr
+      DB_PASSWORD: 1234
+      DB_HOST: db
+      DB_PORT: 5432
+
+volumes:
+  postgres-data:
