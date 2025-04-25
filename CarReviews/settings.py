@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'cr_app.apps.CrAppConfig',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
