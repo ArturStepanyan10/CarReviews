@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import CountryListCreateAPIView, CountryRetrieveUpdateDestroyAPIView, ManufacturerViewSet
+from .views import CountryListCreateAPIView, CountryRetrieveUpdateDestroyAPIView, ManufacturerViewSet, CarViewSet
 
 router = routers.SimpleRouter()
 router.register(r'manufacturers', ManufacturerViewSet, basename='manufacturers')
+router.register(r"cars", CarViewSet, basename='cars')
 
 urlpatterns = [
     path('', include(router.urls)),
