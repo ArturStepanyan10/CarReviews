@@ -52,11 +52,13 @@ class CarViewSet(viewsets.ModelViewSet):
     serializer_class = CarSerializer
 
 
-class CommentViewSet(mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
-                   viewsets.GenericViewSet):
+class CommentViewSet(
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-
