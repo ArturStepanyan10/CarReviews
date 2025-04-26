@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cr_app.models import Country
-from cr_app.serializers import CountrySerializer
+from cr_app.models import Country, Manufacturer
+from cr_app.serializers import CountrySerializer, ManufacturerSerializer
 
 
 class CountryListCreateAPIView(APIView):
@@ -22,6 +22,7 @@ class CountryListCreateAPIView(APIView):
 
 
 class CountryRetrieveUpdateDestroyAPIView(APIView):
+
     def get(self, request, pk):
         country = get_object_or_404(Country, pk=pk)
         serializer = CountrySerializer(country)
@@ -39,3 +40,8 @@ class CountryRetrieveUpdateDestroyAPIView(APIView):
         country = get_object_or_404(Country, pk=pk)
         country.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManufacturerViewSet(viewsets.ModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer
