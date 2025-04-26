@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cr_app.models import Country, Manufacturer
-from cr_app.serializers import CountrySerializer, ManufacturerSerializer
+from cr_app.models import Country, Manufacturer, Car, Comment
+from cr_app.serializers import CountrySerializer, ManufacturerSerializer, CarSerializer
 
 
 class CountryListCreateAPIView(APIView):
@@ -45,3 +45,9 @@ class CountryRetrieveUpdateDestroyAPIView(APIView):
 class ManufacturerViewSet(viewsets.ModelViewSet):
     queryset = Manufacturer.objects.all()
     serializer_class = ManufacturerSerializer
+
+
+class CarViewSet(viewsets.ModelViewSet):
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+
