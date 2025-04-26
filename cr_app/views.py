@@ -1,5 +1,12 @@
+import csv
+from io import BytesIO
+
+import openpyxl
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, mixins
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,6 +15,8 @@ from cr_app.serializers import CountrySerializer, ManufacturerSerializer, CarSer
 
 
 class CountryListCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         countries = Country.objects.all()
         serializer = CountrySerializer(countries, many=True)
@@ -22,6 +31,7 @@ class CountryListCreateAPIView(APIView):
 
 
 class CountryRetrieveUpdateDestroyAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         country = get_object_or_404(Country, pk=pk)
@@ -45,11 +55,57 @@ class CountryRetrieveUpdateDestroyAPIView(APIView):
 class ManufacturerViewSet(viewsets.ModelViewSet):
     queryset = Manufacturer.objects.all()
     serializer_class = ManufacturerSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+    permission_classes = [IsAuthenticated]
+
+
+@api_view(['GET'])
+def export_cars(request):
+    export_format = request.GET.get('form')
+
+    cars = Car.objects.select_related('manufacturer_id')
+
+    if export_format == 'xlsx':
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(['ID', 'Name', 'Manufacturer', 'Release year', 'Graduation year'])
+
+        for car in cars:
+            ws.append([car.id, car.name, car.manufacturer_id.name, car.release_year, car.graduation_year])
+
+        file_stream = BytesIO()
+        wb.save(file_stream)
+        file_stream.seek(0)
+
+        response = HttpResponse(
+            file_stream.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        response['Content-Disposition'] = 'attachment; filename="cars.xlsx"'
+        return response
+
+    elif export_format == 'csv':
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="cars.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['ID', 'Name', 'Manufacturer', 'Release year', 'Graduation year'])
+
+        for car in cars:
+            writer.writerow([car.id, car.name, car.manufacturer_id.name, car.release_year, car.graduation_year])
+
+        return response
+
+    else:
+        response = HttpResponse("К сожалению, в другие форматы экспорт не предусматривается!")
+        return response
 
 
 class CommentViewSet(
@@ -62,3 +118,8 @@ class CommentViewSet(
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'create']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
