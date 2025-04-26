@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cr_app.models import Country, Manufacturer, Car, Comment
-from cr_app.serializers import CountrySerializer, ManufacturerSerializer, CarSerializer
+from cr_app.serializers import CountrySerializer, ManufacturerSerializer, CarSerializer, CommentSerializer
 
 
 class CountryListCreateAPIView(APIView):
@@ -50,4 +50,13 @@ class ManufacturerViewSet(viewsets.ModelViewSet):
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+
+
+class CommentViewSet(mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
