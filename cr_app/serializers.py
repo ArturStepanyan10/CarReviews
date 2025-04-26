@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from cr_app.models import Country, Manufacturer, Car
+from cr_app.models import Country, Manufacturer, Car, Comment
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):
@@ -20,3 +20,9 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ['id', 'name', 'release_year', 'graduation_year', 'manufacturer_id']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'email', 'content', 'car_id', 'created_at']
